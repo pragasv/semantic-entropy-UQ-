@@ -1,0 +1,48 @@
+Preliminaries & dependencies
+
+- root directory of experiments needs to be updated in : analyze_resultswithUQ.py, analyze_reults_without_wandb.py, compute_uncertainty_measures_without_wandb.py
+- conda-env update -f environment.yaml
+- conda activate llm_semantic_uncertainty
+- Our experiments has the capability to use GPT models from the OpenAI API. 
+  Please set the environment variable OPENAI_API_KEY to your OpenAI API key in order to use these models. 
+  Note that OpenAI charges a cost per input token and per generated token. 
+  Costs for reproducing our results vary depending on experiment configuration, but, without any guarantee, should lie somewhere between 5 and 30 USD per run.
+
+
+experiments:
+1) Update model and dataset via arg parser : 
+     args.dataset="squad"  #trivia, squad, bioasq, nq, svamp
+     args.model_name="falcon-rw-1b" #"Llama-3.2-1b" #"Llama-2 7b" or for command line runs as below 
+
+
+
+2) run generate_answers.py for the selected model and dataset combination. This will create experiement files paired with wandb file structure. 
+3) run compute_uncertainty_measures_without_wandb.py on the created file.
+4) run analyze_results_withpout_wandb.py on the created file.
+5) the results will be json dumped in "analysis" folder 
+6) all metrics shown in the paper could be obtained from the analysis_result.json
+
+
+Note:
+- flexibility is provided to choose different models in llama and mistral family.
+- Our experiments rely on Weights & Biases (wandb) to log and save individual runs. 
+  While wandb will be installed automatically with the above conda script, you may need to log in with your wandb API key upon initial execution.
+- the code provided handles loading from locally saved files for ease
+
+Hardware Dependencies
+
+Generally speaking, our experiments require medium computer hardware which is suited for usage with large language models (LLMs).
+Requirements regarding the system's CPU and RAM size are relatively low: any reasonably modern system should suffice, e.g. a system with an Intel 10th generation CPU and 16 GB of system memory or better.
+
+More importantly, all our experiments make use of one or more Graphics Processor Units (GPUs) to speed up LLM inference. Without a GPU, it is not feasible to reproduce our results in a reasonable amount of time. The particular GPU necessary depends on the choice of LLM: LLMs with more parameters require GPUs with more memory. 
+For our models we use 2X 1080Ti NVIDIA GPUs. Smaller 1B models are run by default and 7B models are -int4 bit precision.
+But the code is generalized to run larger models as well - but a higher harder requirement might have to satisfied. 
+
+One can reduce the precision to float16 or int8 to reduce memory requirements without significantly affecting model predictions and their accuracy. 
+We use float16 for 70B models by default, and int8 mode can be enabled for any model by suffixing the model name with -int8.
+
+
+Software Dependencies
+
+Our code relies on Python 3.11 with PyTorch 2.1.
+Our systems run the Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-89-generic x86_64) operating system.
